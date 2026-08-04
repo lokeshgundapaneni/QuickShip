@@ -46,22 +46,26 @@ QuickShip is designed to simplify courier and logistics operations by providing 
 - GitHub
 - Postman
 
----
-
 ## 📂 Project Structure
 
+```text
 src
-├── controller
-├── service
-├── repository
-├── entity
-├── dto
-├── exception
-├── config
-├── security
-└── util
-
----
+└── main
+    ├── java
+    │   └── com
+    │       └── quickship
+    │           ├── config
+    │           ├── controller
+    │           ├── dto
+    │           ├── entity
+    │           ├── exception
+    │           ├── repository
+    │           ├── security
+    │           ├── service
+    │           └── QuickShipApplication.java
+    └── resources
+        └── application.properties
+```
 
 ## 🚀 Future Enhancements
 
