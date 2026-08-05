@@ -9,6 +9,8 @@ import com.quickship.auth.enums.UserRole;
 import com.quickship.auth.enums.UserStatus;
 import com.quickship.auth.repository.UserRepository;
 import com.quickship.auth.service.UserService;
+import com.quickship.common.exception.EmailAlreadyExistsException;
+import com.quickship.common.exception.PhoneAlreadyExistsException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,12 +25,12 @@ public class UserServiceImpl implements UserService {
 		
 		if(userRepository.existsByEmail(request.getEmail()))
 		{
-			throw new IllegalArgumentException("Email already exists. ");
+			throw new EmailAlreadyExistsException("Email already exists");
 		}
 		
 		if(userRepository.existsByPhone(request.getPhone()))
 		{
-			throw new IllegalArgumentException("Phone number already exists. ");
+			throw new PhoneAlreadyExistsException("Phone number already exists. ");
 		}
 		
 		User user=mapToUser(request);
@@ -38,13 +40,12 @@ public class UserServiceImpl implements UserService {
 
 
 	private User mapToUser(RegisterRequest request) {
-		
 		return User.builder()
 				.firstName(request.getFirstName())
 				.LastName(request.getLastName())
 				.email(request.getEmail())
 				.password(request.getPassword())
-				.Phone(request.getPhone())
+				.phone(request.getPhone())
 				.role(UserRole.CUSTOMER)
 				.status(UserStatus.ACTIVE)
 				.emailVerified(false)

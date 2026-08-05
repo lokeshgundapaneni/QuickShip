@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.quickship.auth.dto.request.RegisterRequest;
 import com.quickship.auth.dto.response.UserResponse;
 import com.quickship.auth.service.UserService;
+import com.quickship.common.response.ApiResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,22 @@ public class AuthController {
 	private final UserService userService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request)
-	{
-		UserResponse response = userService.register(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	public ResponseEntity<ApiResponse<UserResponse>> register(
+	        @Valid @RequestBody RegisterRequest request){
+
+	    UserResponse response = userService.register(request);
+
+	    ApiResponse<UserResponse> apiResponse =
+	            ApiResponse.<UserResponse>builder()
+	                    .success(true)
+	                    .message("User registered successfully")
+	                    .data(response)
+	                    .build();
+	    
+	    return ResponseEntity
+	            .status(HttpStatus.CREATED)
+	            .body(apiResponse);
+
 	}
 
 }

@@ -45,7 +45,7 @@ public class User {
 	private String password;
 	
 	@Column(unique = true)
-	private String Phone;
+	private String phone;
 	
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
