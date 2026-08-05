@@ -1,5 +1,6 @@
 package com.quickship.auth.service.impl;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.quickship.auth.dto.request.RegisterRequest;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 	
 	@Override
 	public UserResponse register(RegisterRequest request) {
@@ -44,7 +46,7 @@ public class UserServiceImpl implements UserService {
 				.firstName(request.getFirstName())
 				.LastName(request.getLastName())
 				.email(request.getEmail())
-				.password(request.getPassword())
+				.password(passwordEncoder.encode(request.getPassword()))
 				.phone(request.getPhone())
 				.role(UserRole.CUSTOMER)
 				.status(UserStatus.ACTIVE)
