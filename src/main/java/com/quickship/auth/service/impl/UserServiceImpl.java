@@ -1,9 +1,13 @@
 package com.quickship.auth.service.impl;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.quickship.auth.dto.request.LoginRequest;
 import com.quickship.auth.dto.request.RegisterRequest;
+import com.quickship.auth.dto.response.LoginResponse;
 import com.quickship.auth.dto.response.UserResponse;
 import com.quickship.auth.entity.User;
 import com.quickship.auth.enums.UserRole;
@@ -21,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final AuthenticationManager authenticationManager;
 	
 	@Override
 	public UserResponse register(RegisterRequest request) {
@@ -67,6 +72,22 @@ public class UserServiceImpl implements UserService {
                 .createdAt(user.getCreatedAt())
                 .build();
 	}
+
+
+	@Override
+	public LoginResponse login(LoginRequest request) {
+		authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(
+						request.getEmail(),
+						request.getPassword())
+		);
+		return LoginResponse.builder()
+		        .message("Login Successful")
+		        .build();
+	}
+	
+	
+	
 	
 
 }

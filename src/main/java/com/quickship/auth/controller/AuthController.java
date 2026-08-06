@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.quickship.auth.dto.request.LoginRequest;
 import com.quickship.auth.dto.request.RegisterRequest;
+import com.quickship.auth.dto.response.LoginResponse;
 import com.quickship.auth.dto.response.UserResponse;
 import com.quickship.auth.service.UserService;
 import com.quickship.common.response.ApiResponse;
@@ -41,6 +43,24 @@ public class AuthController {
 	            .status(HttpStatus.CREATED)
 	            .body(apiResponse);
 
+	}
+	
+	
+	
+	@PostMapping("/login")
+	public ResponseEntity<ApiResponse<LoginResponse>> login(
+	        @Valid @RequestBody LoginRequest request) {
+		System.out.println("Login API called");
+	    LoginResponse response = userService.login(request);
+
+	    ApiResponse<LoginResponse> apiResponse =
+	            ApiResponse.<LoginResponse>builder()
+	                    .success(true)
+	                    .message("Login Successful")
+	                    .data(response)
+	                    .build();
+
+	    return ResponseEntity.ok(apiResponse);
 	}
 
 }
