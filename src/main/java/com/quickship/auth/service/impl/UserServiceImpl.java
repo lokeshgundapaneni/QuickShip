@@ -2,6 +2,7 @@ package com.quickship.auth.service.impl;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,8 @@ import com.quickship.auth.repository.UserRepository;
 import com.quickship.auth.service.UserService;
 import com.quickship.common.exception.EmailAlreadyExistsException;
 import com.quickship.common.exception.PhoneAlreadyExistsException;
+import com.quickship.security.jwt.JwtService;
+import com.quickship.security.model.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
+	private final JwtService jwtService;
 	
 	@Override
 	public UserResponse register(RegisterRequest request) {
@@ -76,18 +80,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public LoginResponse login(LoginRequest request) {
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(
-						request.getEmail(),
-						request.getPassword())
-		);
+		Authentication authentication =
+		        authenticationManager.authenticate(
+		                new UsernamePasswordAuthenticationToken(
+		                        request.getEmail(),
+		                        request.getPassword()
+		                )
+		        );
+		
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
+		
+		String token=jwtService.generateToken(userDetails);
 		return LoginResponse.builder()
-		        .message("Login Successful")
+		        .token(token)
+		        .type("Bearer")
+		        .email(userDetails.getUsername())
+		        .role(userDetails.getUser().getRole().name())
 		        .build();
 	}
-	
-	
-	
-	
-
 }

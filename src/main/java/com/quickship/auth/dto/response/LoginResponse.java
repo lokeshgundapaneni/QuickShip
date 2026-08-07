@@ -13,6 +13,9 @@ import lombok.Builder;
 @Builder
 public class LoginResponse {
 	
-	private String message;
+	private String token;
+	private String type;
+	private String email;
+	private String role;
 
 }
