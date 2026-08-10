@@ -1,35 +1,42 @@
 package com.quickship.shipment.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
+@Table(name="addresses")
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
+@Builder
 public class Address {
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long Id;
-	
-	private String name;
-	
-	private String phone;
-	
-	private String addressLine1;
-	
-	private String addressLine2;
-	
-	private String city;
-	
-	private String state;
-	
-	private String country;
-	
-	private String postalCode;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(nullable = false, length = 15)
+    private String phone;
+
+    @Column(nullable = false, length = 255)
+    private String addressLine1;
+
+    @Column(length = 255)
+    private String addressLine2;
+
+    @Column(nullable = false, length = 100)
+    private String city;
+
+    @Column(nullable = false, length = 100)
+    private String state;
+
+    @Column(nullable = false, length = 100)
+    private String country;
+
+    @Column(nullable = false, length = 20)
+    private String postalCode;
 }
