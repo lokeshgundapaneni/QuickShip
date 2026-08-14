@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.quickship.common.response.ApiResponse;
 import com.quickship.shipment.dto.request.CreateShipmentRequest;
 import com.quickship.shipment.dto.response.ShipmentResponse;
+import com.quickship.shipment.enums.ShipmentStatus;
 import com.quickship.shipment.service.ShippingService;
 import com.quickship.shipment.service.impl.ShippingServiceImpl;
 
@@ -78,10 +80,14 @@ public class ShipmentController {
 	@GetMapping("/my")
 	@PreAuthorize("hasRole('CUSTOMER')")
 	public ResponseEntity<ApiResponse<Page<ShipmentResponse>>> getMyShipments(
+	        @RequestParam(required = false) ShipmentStatus status,
 	        Pageable pageable) {
 
 	    Page<ShipmentResponse> shipments =
-	            shippingService.getMyShipments(pageable);
+	            shippingService.getMyShipments(
+	                    status,
+	                    pageable
+	            );
 
 	    ApiResponse<Page<ShipmentResponse>> response =
 	            new ApiResponse<>(
@@ -89,6 +95,7 @@ public class ShipmentController {
 	                    "Shipments retrieved successfully",
 	                    shipments
 	            );
+
 	    return ResponseEntity.ok(response);
 	}
 	

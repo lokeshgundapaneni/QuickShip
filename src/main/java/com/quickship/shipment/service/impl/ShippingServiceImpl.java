@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,7 @@ import com.quickship.shipment.exception.ShipmentNotFoundException;
 import com.quickship.shipment.repository.AddressRepository;
 import com.quickship.shipment.repository.ShipmentRepository;
 import com.quickship.shipment.service.ShippingService;
+import com.quickship.shipment.specification.ShipmentSpecification;
 
 import lombok.RequiredArgsConstructor;
 
@@ -166,15 +168,24 @@ public class ShippingServiceImpl implements ShippingService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<ShipmentResponse> getMyShipments(Pageable pageable) {
+	public Page<ShipmentResponse> getMyShipments(ShipmentStatus status,Pageable pageable) {
 
 	    Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
 	    String email = authentication.getName();
 	    User customer = userRepository.findByEmail(email)
 	            .orElseThrow(()->new UserNotFoundException("Authenticated user not found"));
+	    
+	    Specification<Shipment> specification =
+	            ShipmentSpecification.belongsToCustomer(
+	                    customer.getId());
+	    if (status != null) {
+	        specification = specification.and(
+	                ShipmentSpecification.hasStatus(status)
+	        );
+	    }
 	    Page<Shipment> shipments =
-	            shipmentRepository.findByCustomer(
-	                    customer,
+	    		shipmentRepository.findAll(
+	                    specification,
 	                    pageable
 	            );
 	    return shipments.map(this::mapToResponse);
