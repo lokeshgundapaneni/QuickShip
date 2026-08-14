@@ -15,4 +15,5 @@ public interface ShippingService {
 	ShipmentResponse getShipmentById(Long shipmentId);
 	ShipmentResponse getShipmentByTrackingNumber(String trackingNumber);
 	Page<ShipmentResponse> getMyShipments(Pageable pageable);
+	void cancelShipment(Long ShipmentId);
 }

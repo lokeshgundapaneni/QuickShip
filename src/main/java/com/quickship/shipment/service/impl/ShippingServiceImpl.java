@@ -20,6 +20,8 @@ import com.quickship.shipment.dto.response.AddressResponse;
 import com.quickship.shipment.dto.response.ShipmentResponse;
 import com.quickship.shipment.entity.Address;
 import com.quickship.shipment.entity.Shipment;
+import com.quickship.shipment.enums.ShipmentStatus;
+import com.quickship.shipment.exception.ShipmentCancellationException;
 import com.quickship.shipment.exception.ShipmentNotFoundException;
 import com.quickship.shipment.repository.AddressRepository;
 import com.quickship.shipment.repository.ShipmentRepository;
@@ -175,10 +177,34 @@ public class ShippingServiceImpl implements ShippingService {
 	                    customer,
 	                    pageable
 	            );
-	    
-	    
-
 	    return shipments.map(this::mapToResponse);
+	}
+
+
+	@Override
+	public void cancelShipment(Long ShipmentId) {
+		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+	    String email = authentication.getName();
+	    User customer = userRepository.findByEmail(email)
+	            .orElseThrow(()->new UserNotFoundException("Authenticated user not found"));
+	    Shipment shipment=shipmentRepository.findById(ShipmentId).orElseThrow(
+	    		()->new ShipmentNotFoundException("Shipment not found with id: "+ ShipmentId));
+	    if(!canCancel(shipment.getStatus()))
+	    {
+	    	throw new ShipmentCancellationException(
+	                "Shipment cannot be cancelled in status: "
+	                + shipment.getStatus());
+	    }
+	    shipment.setStatus(ShipmentStatus.CANCELLED);
+	    shipmentRepository.save(shipment);
+	}
+
+
+	private boolean canCancel(ShipmentStatus status) {
+		 return status == ShipmentStatus.CREATED
+		            || status == ShipmentStatus.PENDING_PAYMENT
+		            || status == ShipmentStatus.CONFIRMED
+		            || status == ShipmentStatus.PICKUP_ASSIGNED;
 	}
 
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.quickship.common.response.ApiResponse;
+import com.quickship.shipment.exception.ShipmentCancellationException;
 import com.quickship.shipment.exception.ShipmentNotFoundException;
 
 @RestControllerAdvice
@@ -82,7 +83,7 @@ public class GlobalExceptionHandler {
     	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
     
-    @ExceptionHandler
+    @ExceptionHandler(ShipmentNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleShipmentNotFoundException(ShipmentNotFoundException ex)
     {
     	ApiResponse<Void> response=ApiResponse.<Void>builder()
@@ -92,5 +93,19 @@ public class GlobalExceptionHandler {
                 .build();
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
+    
+    @ExceptionHandler(ShipmentCancellationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleShipmentCancellationException(ShipmentCancellationException ex)
+    {
+    	ApiResponse<Void> response=ApiResponse.<Void>builder()
+				.success(false)
+                .message(ex.getMessage())
+                .data(null)
+                .build();
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+    
+    
+    
 
 }
