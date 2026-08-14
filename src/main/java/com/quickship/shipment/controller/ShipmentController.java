@@ -1,8 +1,12 @@
 package com.quickship.shipment.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,5 +39,55 @@ public class ShipmentController {
                 response);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+	}
+	
+	@GetMapping("/{shipmentId}")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	public ResponseEntity<ApiResponse<ShipmentResponse>> getShipmentById(
+	        @PathVariable Long shipmentId) {
+
+	    ShipmentResponse response =
+	            shippingService.getShipmentById(shipmentId);
+
+	    ApiResponse<ShipmentResponse> apiResponse =
+	            new ApiResponse<>(
+	                    true,
+	                    "Shipment retrieved successfully",
+	                    response
+	            );
+
+	    return ResponseEntity.ok(apiResponse);
+	}
+	
+	@GetMapping("/track/{trackingNumber}")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	public ResponseEntity<ApiResponse<ShipmentResponse>> getShipmentByTrackingId(@PathVariable String trackingNumber)
+	{
+		ShipmentResponse response = shippingService.getShipmentByTrackingNumber(trackingNumber);
+		ApiResponse<ShipmentResponse> apiResponse =
+	            new ApiResponse<>(
+	                    true,
+	                    "Shipment retrieved successfully",
+	                    response
+	            );
+
+	    return ResponseEntity.ok(apiResponse);
+	}
+	
+	@GetMapping("/my")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	public ResponseEntity<ApiResponse<Page<ShipmentResponse>>> getMyShipments(
+	        Pageable pageable) {
+
+	    Page<ShipmentResponse> shipments =
+	            shippingService.getMyShipments(pageable);
+
+	    ApiResponse<Page<ShipmentResponse>> response =
+	            new ApiResponse<>(
+	                    true,
+	                    "Shipments retrieved successfully",
+	                    shipments
+	            );
+	    return ResponseEntity.ok(response);
 	}
 }

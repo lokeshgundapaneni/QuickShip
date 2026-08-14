@@ -1,6 +1,11 @@
 package com.quickship.shipment.service.impl;
 
+import java.util.Optional;
+
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,6 +20,7 @@ import com.quickship.shipment.dto.response.AddressResponse;
 import com.quickship.shipment.dto.response.ShipmentResponse;
 import com.quickship.shipment.entity.Address;
 import com.quickship.shipment.entity.Shipment;
+import com.quickship.shipment.exception.ShipmentNotFoundException;
 import com.quickship.shipment.repository.AddressRepository;
 import com.quickship.shipment.repository.ShipmentRepository;
 import com.quickship.shipment.service.ShippingService;
@@ -121,5 +127,58 @@ public class ShippingServiceImpl implements ShippingService {
                 .postalCode(address.getPostalCode())
                 .build();
     }
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public ShipmentResponse getShipmentById(Long shipmentId) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String email=authentication.getName();
+		
+		User customer=userRepository.findByEmail(email).orElseThrow(
+				()->new UserNotFoundException("Authenticated User Not Found"));
+		
+		Shipment shipment=shipmentRepository.findById(shipmentId).orElseThrow(
+				()->new ShipmentNotFoundException("Shipment not found with id: " + shipmentId));
+		
+		if (!shipment.getCustomer().getId().equals(customer.getId()))
+		{
+			throw new AccessDeniedException("You are not allowed to access this shipment");
+		}
+		
+		return mapToResponse(shipment);
+		
+	}
+
+
+	@Override
+	@Transactional(readOnly=true)
+	public ShipmentResponse getShipmentByTrackingNumber(String trackingNumber)
+	{
+		Shipment shipment = shipmentRepository.findByTrackingNumber(trackingNumber).orElseThrow(
+				()->new ShipmentNotFoundException("Shipment not found with tracking number: "+ trackingNumber));
+		return mapToResponse(shipment);
+	}
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<ShipmentResponse> getMyShipments(Pageable pageable) {
+
+	    Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+	    String email = authentication.getName();
+	    User customer = userRepository.findByEmail(email)
+	            .orElseThrow(()->new UserNotFoundException("Authenticated user not found"));
+	    Page<Shipment> shipments =
+	            shipmentRepository.findByCustomer(
+	                    customer,
+	                    pageable
+	            );
+	    
+	    
+
+	    return shipments.map(this::mapToResponse);
+	}
 
 }
