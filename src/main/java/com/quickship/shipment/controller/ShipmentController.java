@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -43,7 +45,13 @@ public class ShipmentController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
 		        responseCode = "201",
-		        description = "Shipment created successfully"
+		        description = "Shipment created successfully",
+		        content = @Content(
+		        		      mediaType = "application/json",
+		        		      schema = @Schema(
+		        		      implementation = ShipmentResponse.class
+		        		        )
+		        		    )
 		    ),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
 	        responseCode = "400",
@@ -80,7 +88,13 @@ public class ShipmentController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
 				responseCode="200",
-				description="Shipment retrieved successfully"
+				description="Shipment retrieved successfully",
+				content = @Content(
+						     mediaType = "application/json",
+						     schema = @Schema(
+						     implementation = ShipmentResponse.class
+						        )
+						    )
 				),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
 				responseCode="401",
